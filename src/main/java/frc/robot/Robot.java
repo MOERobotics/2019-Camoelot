@@ -29,6 +29,9 @@ public class Robot extends TimedRobot {
   Joystick leftJoystick = new Joystick(0);
 
 
+  TalonSRX leftMotorA = new TalonSRX(1);
+  TalonSRX leftMotorB = new TalonSRX(2);
+  TalonSRX leftMotorC = new TalonSRX(3);
 
   TalonSRX rightMotorA = new TalonSRX(12);
   TalonSRX rightMotorB = new TalonSRX(13);
@@ -38,11 +41,7 @@ public class Robot extends TimedRobot {
   TalonSRX shooterMotorA = new TalonSRX(10);
   TalonSRX shooterMotorB = new TalonSRX(11);
 
-  List<TalonSRX> leftMotors = Arrays.asList(
-          new TalonSRX(0),
-          new TalonSRX(1),
-          new TalonSRX(2)
-  );
+
 
   /**
    * This function is run when the robot is first started up and should be
