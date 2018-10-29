@@ -5,46 +5,28 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Robot extends TimedRobot {
+    int gear; //gear number 1,2,3,4 only
 
+    Joystick rJoyStk = new Joystick(0);
 
-    Joystick leftJoystick = new Joystick(0);
-
-
-    TalonSRX leftMotorA  = new TalonSRX(12);
-    TalonSRX leftMotorB  = new TalonSRX(13);
-    TalonSRX leftMotorC  = new TalonSRX(14);
-
-    TalonSRX rightMotorA = new TalonSRX( 1);
-    TalonSRX rightMotorB = new TalonSRX( 2);
-    TalonSRX rightMotorC = new TalonSRX( 3);
-
-    TalonSRX collector   = new TalonSRX( 0);
-
-    TalonSRX shootMotorA = new TalonSRX(10);
-    TalonSRX shootMotorB = new TalonSRX(11);
-
+    List<TalonSRX> leftMotors = new ArrayList<>();
+    List<TalonSRX> rightMotors = new ArrayList<>();
     @Override
     public void robotInit() {
-        rightMotorA.setInverted(true);
-        rightMotorB.setInverted(true);
-        rightMotorC.setInverted(true);
-        System.out.printf("I am a robot\n");
-        System.err.printf("Beep boop\n");
+        System.out.println("Robot Start!");
+        //initiate motors to motor array
+        for(int i=0;i<3;i++){
+            leftMotors.add(new TalonSRX(i+1)); //1,2,3
+            rightMotors.add(new TalonSRX(i+12)); //12,13,14
+            rightMotors.get(i).setInverted(true); //set right inverted
+        }
     }
-
     @Override
     public void robotPeriodic() {
-
-    }
-
-    @Override
-    public void disabledInit() {
-
-    }
-
-    @Override
-    public void disabledPeriodic() {
 
     }
 
@@ -59,63 +41,54 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void teleopInit() {
-
-    }
-
-    @Override
     public void teleopPeriodic() {
-        double joystickX = leftJoystick.getX();
-        double joystickY = -leftJoystick.getY();
+        double JoyX = rJoyStk.getX();
+        double JoyY = -rJoyStk.getY(); //negative for joystick being upside down
 
-        boolean buttonTwoIsPressed = leftJoystick.getRawButton(2);
-        boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
-        boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
+        //calculated motor values using "Trusted Formula"!!!
+        //left = Y+X   right = Y-X
+        double leftMP = JoyY + JoyX;
+        double rightMP = JoyY - JoyX;
 
-        if (buttonThreeIsPressed && !buttonFourIsPressed) {
-            collector.set(ControlMode.PercentOutput, 0.5);
-        } else if (buttonFourIsPressed && !buttonThreeIsPressed) {
-            collector.set(ControlMode.PercentOutput, -0.5);
-        } else {
-            collector.set(ControlMode.PercentOutput, 0.0);
+        boolean doGearUp = rJoyStk.getRawButton(3);
+        boolean doGearDown = rJoyStk.getRawButton(2);
+
+        if(doGearUp && gear < 4){ //if button pressed and can go up
+            gear++;
+        }
+        if(doGearDown && gear > 1) { //if button pressed and can go down
+            gear--;
         }
 
-        if (buttonTwoIsPressed) {
-            setDriveMotorPower(0.5, -.5);
-
-        } else if (!buttonTwoIsPressed) {
-            double leftMotorPower = capMotorPower(joystickY + joystickX);
-            double rightMotorPower = capMotorPower(joystickY - joystickX);
-            setDriveMotorPower(leftMotorPower, rightMotorPower);
+        boolean TurnButton = rJoyStk.getRawButton(2); //try to find different button check way
+        if(TurnButton){
+            //if button override motor powers to turn robot
+            leftMP = 0.5;
+            rightMP = -0.5;
         }
 
+        setDriveMP(leftMP, rightMP); //apply motor drive
     }
+    private static double limit(double min, double num, double max){
+        return Math.min(Math.max(num,min),max);
+    }
+    private void setDriveMP(double lmp, double rmp){ //takes left and right motor power
+        //limit left and right motor, then go though motor array
+        lmp = limit(-1,lmp,1);
+        rmp = limit(-1,rmp,1);
 
-    @Override
-    public void testInit() {
+        double gearMult = (double)gear / 4.0; //divide by 4
+        lmp *= gearMult;
+        rmp *= gearMult;
 
+        for(int i=0;i<leftMotors.size();i++){
+            leftMotors.get(i).set(ControlMode.PercentOutput, lmp);
+            rightMotors.get(i).set(ControlMode.PercentOutput, rmp);
+        }
     }
 
     @Override
     public void testPeriodic() {
-    }
 
-    public static double capMotorPower(double inputMotorPower) {
-        if (inputMotorPower > 1) inputMotorPower = 1;
-        if (inputMotorPower < -1) inputMotorPower = -1;
-        return inputMotorPower;
-    }
-
-    public void setDriveMotorPower(
-        double leftMotorPower,
-        double rightMotorPower
-    ) {
-        leftMotorA.set(ControlMode.PercentOutput, leftMotorPower);
-        leftMotorB.set(ControlMode.PercentOutput, leftMotorPower);
-        leftMotorC.set(ControlMode.PercentOutput, leftMotorPower);
-
-        rightMotorA.set(ControlMode.PercentOutput, rightMotorPower);
-        rightMotorB.set(ControlMode.PercentOutput, rightMotorPower);
-        rightMotorC.set(ControlMode.PercentOutput, rightMotorPower);
     }
 }
