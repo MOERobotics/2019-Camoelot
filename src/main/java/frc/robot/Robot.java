@@ -65,31 +65,55 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+
+        int gearNumber = 1;
+        boolean buttonFiveIsPressed = leftJoystick.getRawButtonPressed(5);
+        boolean buttonSixIsPressed = leftJoystick.getRawButtonPressed(6);
+
+
+        if (buttonFiveIsPressed) {
+            gearNumber++;
+        } else if (buttonSixIsPressed) {
+            gearNumber = gearNumber - 1;
+        } else {
+            System.out.println("Hello world");
+        }
+
         double joystickX = leftJoystick.getX();
         double joystickY = -leftJoystick.getY();
 
-        boolean buttonTwoIsPressed = leftJoystick.getRawButton(2);
-        boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
-        boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
 
-        if (buttonThreeIsPressed && !buttonFourIsPressed) {
-            collector.set(ControlMode.PercentOutput, 0.5);
-        } else if (buttonFourIsPressed && !buttonThreeIsPressed) {
-            collector.set(ControlMode.PercentOutput, -0.5);
-        } else {
-            collector.set(ControlMode.PercentOutput, 0.0);
+        double leftMotorPower = capMotorPower(joystickY + joystickX, gearNumber);
+        double rightMotorPower = capMotorPower(joystickY - joystickX, gearNumber);
+        setDriveMotorPower(leftMotorPower, rightMotorPower);
         }
+         /**
 
-        if (buttonTwoIsPressed) {
-            setDriveMotorPower(0.5, -.5);
 
-        } else if (!buttonTwoIsPressed) {
-            double leftMotorPower = capMotorPower(joystickY + joystickX);
-            double rightMotorPower = capMotorPower(joystickY - joystickX);
-            setDriveMotorPower(leftMotorPower, rightMotorPower);
+         boolean buttonFiveIsPressed = leftJoystick.getRawButtonPressed(5);
+        boolean buttonSixIsPressed = leftJoystick.getRawButtonPressed(6);
+
+        double gearOneMotorPower;
+        double gearTwoMotorPower;
+        double gearThreeMotorPower;
+        double gearFourMotorPower;
+
+        if(buttonFiveIsPressed && !buttonSixIsPressed){
+            gearOneMotorPower = capMotorPower(.25);
+            gearTwoMotorPower = capMotorPower(.50);
+            gearThreeMotorPower = capMotorPower(.75);
+            gearFourMotorPower = capMotorPower(1.0);
+
+
+
+        } else if(!buttonFiveIsPressed && buttonSixIsPressed){
+            gearOneMotorPower = capMotorPower(-.25);
+            gearTwoMotorPower = capMotorPower(-.50);
+            gearThreeMotorPower = capMotorPower(-.75);
+            gearFourMotorPower = capMotorPower(-1.0);
         }
+*/
 
-    }
 
     @Override
     public void testInit() {
@@ -100,10 +124,22 @@ public class Robot extends TimedRobot {
     public void testPeriodic() {
     }
 
-    public static double capMotorPower(double inputMotorPower) {
-        if (inputMotorPower > 1) inputMotorPower = 1;
-        if (inputMotorPower < -1) inputMotorPower = -1;
+    public static double capMotorPower(double inputMotorPower, int gearNumber) {
+        if(gearNumber == 1) {
+            inputMotorPower = inputMotorPower * 0.25;
+
+        } else if (gearNumber == 2) {
+            inputMotorPower = inputMotorPower * 0.50;
+
+        } else if (gearNumber == 3) {
+            inputMotorPower = inputMotorPower * 0.75;
+
+        } else if (gearNumber == 4) {
+            inputMotorPower = inputMotorPower;
+
+        }
         return inputMotorPower;
+
     }
 
     public void setDriveMotorPower(
