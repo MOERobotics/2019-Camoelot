@@ -4,12 +4,15 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Robot extends TimedRobot {
     int gear; //gear number 1,2,3,4 only
+
+    List<Boolean> prevButton = new ArrayList<>();
 
     Joystick rJoyStk = new Joystick(0);
 
@@ -23,6 +26,9 @@ public class Robot extends TimedRobot {
             leftMotors.add(new TalonSRX(i+1)); //1,2,3
             rightMotors.add(new TalonSRX(i+12)); //12,13,14
             rightMotors.get(i).setInverted(true); //set right inverted
+        }
+        for(int i=0;i<10;i++){
+            prevButton.add(false);
         }
     }
     @Override
@@ -50,8 +56,8 @@ public class Robot extends TimedRobot {
         double leftMP = JoyY + JoyX;
         double rightMP = JoyY - JoyX;
 
-        boolean doGearUp = rJoyStk.getRawButton(3);
-        boolean doGearDown = rJoyStk.getRawButton(2);
+        boolean doGearUp = didButtonTrigger(3);
+        boolean doGearDown = didButtonTrigger(2);
 
         if(doGearUp && gear < 4){ //if button pressed and can go up
             gear++;
@@ -59,15 +65,10 @@ public class Robot extends TimedRobot {
         if(doGearDown && gear > 1) { //if button pressed and can go down
             gear--;
         }
-
-        boolean TurnButton = rJoyStk.getRawButton(2); //try to find different button check way
-        if(TurnButton){
-            //if button override motor powers to turn robot
-            leftMP = 0.5;
-            rightMP = -0.5;
-        }
+        SmartDashboard.putNumber("GearNum", gear);
 
         setDriveMP(leftMP, rightMP); //apply motor drive
+        updateButtonsArr(); //get all button values from joystick
     }
     private static double limit(double min, double num, double max){
         return Math.min(Math.max(num,min),max);
@@ -78,12 +79,25 @@ public class Robot extends TimedRobot {
         rmp = limit(-1,rmp,1);
 
         double gearMult = (double)gear / 4.0; //divide by 4
+        SmartDashboard.putNumber("GearMult", gearMult);
         lmp *= gearMult;
         rmp *= gearMult;
 
         for(int i=0;i<leftMotors.size();i++){
             leftMotors.get(i).set(ControlMode.PercentOutput, lmp);
             rightMotors.get(i).set(ControlMode.PercentOutput, rmp);
+        }
+    }
+    private void updateButtonsArr(){
+        for(int i=0;i<10;i++){
+            prevButton.set(i, rJoyStk.getRawButton(i));
+        }
+    }
+    private boolean didButtonTrigger(int button){
+        if(prevButton.get(button) != rJoyStk.getRawButton(button)){
+            return true;
+        }else{
+            return false;
         }
     }
 
