@@ -71,23 +71,63 @@ public class Robot extends TimedRobot {
         boolean buttonTwoIsPressed = leftJoystick.getRawButton(2);
         boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
         boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
+        //boolean buttonFiveIsPressed = leftJoystick.getRawButton(5);
+        //boolean buttonSixIsPressed = leftJoystick.getRawButton(6);
 
-        if (buttonThreeIsPressed && !buttonFourIsPressed) {
+        /*if (buttonThreeIsPressed && !buttonFourIsPressed) {
             collector.set(ControlMode.PercentOutput, 0.5);
         } else if (buttonFourIsPressed && !buttonThreeIsPressed) {
             collector.set(ControlMode.PercentOutput, -0.5);
         } else {
             collector.set(ControlMode.PercentOutput, 0.0);
+        }*/
+
+        if (leftMotorA.getMotorOutputPercent() == 0) {
+            if (buttonTwoIsPressed) {
+                setDriveMotorPower(0, 0);
+            }
+            if (buttonThreeIsPressed) {
+                setDriveMotorPower(0.25, -.25);
+            }
+        }
+        if (leftMotorA.getMotorOutputPercent() == 0.25) {
+            if (buttonTwoIsPressed) {
+                setDriveMotorPower(0, 0);
+            }
+            if (buttonThreeIsPressed) {
+                setDriveMotorPower(0.5, -.5);
+            }
+        }
+        else if (leftMotorA.getMotorOutputPercent() == 0.5) {
+            if (buttonTwoIsPressed) {
+                setDriveMotorPower(.25, -.25);
+            }
+            if (buttonThreeIsPressed) {
+                setDriveMotorPower(0.75, -.75);
+            }
+        }
+        else if (leftMotorA.getMotorOutputPercent() == 0.75) {
+            if (buttonTwoIsPressed) {
+                setDriveMotorPower(.5, -.5);
+            }
+            if (buttonThreeIsPressed) {
+                setDriveMotorPower(1, 1);
+            }
+        }
+        else if (leftMotorA.getMotorOutputPercent() == 1.0) {
+            if (buttonTwoIsPressed) {
+                setDriveMotorPower(.75, -.75);
+            }
+            if (buttonThreeIsPressed) {
+                setDriveMotorPower(1, 1);
+            }
         }
 
-        if (buttonTwoIsPressed) {
-            setDriveMotorPower(0.5, -.5);
-
-        } else if (!buttonTwoIsPressed) {
+        /*else {
             double leftMotorPower = capMotorPower(joystickY + joystickX);
             double rightMotorPower = capMotorPower(joystickY - joystickX);
             setDriveMotorPower(leftMotorPower, rightMotorPower);
-        }
+        }*/
 
     }
 
@@ -118,4 +158,6 @@ public class Robot extends TimedRobot {
         rightMotorB.set(ControlMode.PercentOutput, rightMotorPower);
         rightMotorC.set(ControlMode.PercentOutput, rightMotorPower);
     }
+
+
 }
