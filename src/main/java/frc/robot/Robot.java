@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("ALL")
 public class Robot extends TimedRobot {
     int gear; //gear number 1,2,3,4 only
 
@@ -49,7 +50,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         double JoyX = rJoyStk.getX();
-        double JoyY = -rJoyStk.getY(); //negative for joystick being upside down
+        double JoyY = rJoyStk.getY();
 
         //calculated motor values using "Trusted Formula"!!!
         //left = Y+X   right = Y-X
@@ -60,12 +61,11 @@ public class Robot extends TimedRobot {
         boolean doGearUp = didButtonTrigger(3);
         boolean doGearDown = didButtonTrigger(2);
 
-        if(doGearUp && gear < 4){ //if button pressed and can go up
-            gear++;
-        }
-        if(doGearDown && gear > 1) { //if button pressed and can go down
-            gear--;
-        }
+        //if button pressed and can go up
+        if(doGearUp && gear < 4) gear++;
+        //if button pressed and can go down
+        if(doGearDown && gear > 1) gear--;
+
         SmartDashboard.putNumber("GearNum", gear);
 
         setDriveMP(leftMP, rightMP); //apply motor drive
@@ -95,11 +95,7 @@ public class Robot extends TimedRobot {
         }
     }
     private boolean didButtonTrigger(int button) {
-        if (prevButton.get(button) != rJoyStk.getRawButton(button)) {
-            return true;
-        } else {
-            return false;
-        }
+        return prevButton.get(button) != rJoyStk.getRawButton(button);
     }
 
     @Override
