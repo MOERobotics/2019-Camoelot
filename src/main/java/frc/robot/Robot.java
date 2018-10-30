@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
         double leftMP = JoyY + JoyX;
         double rightMP = JoyY - JoyX;
 
+        //get button triggers
         boolean doGearUp = didButtonTrigger(3);
         boolean doGearDown = didButtonTrigger(2);
 
@@ -93,10 +94,10 @@ public class Robot extends TimedRobot {
             prevButton.set(i, rJoyStk.getRawButton(i));
         }
     }
-    private boolean didButtonTrigger(int button){
-        if(prevButton.get(button) != rJoyStk.getRawButton(button)){
+    private boolean didButtonTrigger(int button) {
+        if (prevButton.get(button) != rJoyStk.getRawButton(button)) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
