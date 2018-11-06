@@ -72,15 +72,15 @@ public class Robot extends TimedRobot {
 
         boolean buttonTwoIsPressed = leftJoystick.getRawButton(2);
         boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
-        boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
+        //boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
 
-        if (buttonThreeIsPressed && !buttonFourIsPressed) {
+        /*if (buttonThreeIsPressed && !buttonFourIsPressed) {
             collector.set(ControlMode.PercentOutput, 0.5);
         } else if (buttonFourIsPressed && !buttonThreeIsPressed) {
             collector.set(ControlMode.PercentOutput, -0.5);
         } else {
             collector.set(ControlMode.PercentOutput, 0.0);
-        }
+        }*/
 
         /*if (buttonTwoIsPressed) {
             setDriveMotorPower(0.5, -.5);
