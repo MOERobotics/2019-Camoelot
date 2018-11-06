@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
 
@@ -63,10 +64,11 @@ public class Robot extends TimedRobot {
 
     }
 
+    private int gearNumber = 0;
+
     @Override
     public void teleopPeriodic() {
 
-        int gearNumber = 1;
         boolean buttonFiveIsPressed = leftJoystick.getRawButtonPressed(5);
         boolean buttonSixIsPressed = leftJoystick.getRawButtonPressed(6);
 
@@ -145,7 +147,11 @@ public class Robot extends TimedRobot {
     public void setDriveMotorPower(
         double leftMotorPower,
         double rightMotorPower
+
     ) {
+        SmartDashboard.putNumber("Power of the left motor:", leftMotorPower);
+        SmartDashboard.putNumber("Power of the right motor:", rightMotorPower);
+
         leftMotorA.set(ControlMode.PercentOutput, leftMotorPower);
         leftMotorB.set(ControlMode.PercentOutput, leftMotorPower);
         leftMotorC.set(ControlMode.PercentOutput, leftMotorPower);
