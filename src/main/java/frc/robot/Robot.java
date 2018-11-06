@@ -2,9 +2,11 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.wpilibj.CounterBase;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Encoder;
 
 public class Robot extends TimedRobot {
 
@@ -25,6 +27,10 @@ public class Robot extends TimedRobot {
     TalonSRX shootMotorA = new TalonSRX(10);
     TalonSRX shootMotorB = new TalonSRX(11);
 
+    Encoder encoderL = new Encoder(0, 1, true, CounterBase.EncodingType.k1X);
+    Encoder encoderR = new Encoder(2, 3, true, CounterBase.EncodingType.k1X);
+
+
     @Override
     public void robotInit() {
         rightMotorA.setInverted(true);
@@ -32,6 +38,11 @@ public class Robot extends TimedRobot {
         rightMotorC.setInverted(true);
         System.out.printf("I am a robot\n");
         System.err.printf("Beep boop\n");
+
+        SmartDashboard.putNumber("Power of the left encoder:", encoderL.getDistance());
+        SmartDashboard.putNumber("Power of the right encoder:", encoderR.getDistance());
+
+
     }
 
     @Override
@@ -61,7 +72,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-
     }
 
     private int gearNumber = 0;
