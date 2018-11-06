@@ -5,6 +5,8 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.*;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.CounterBase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,10 @@ public class Robot extends TimedRobot {
 
     List<TalonSRX> leftMotors = new ArrayList<>();
     List<TalonSRX> rightMotors = new ArrayList<>();
+
+    Encoder encoderL = new Encoder(0,1,true,CounterBase.EncodingType.k1X);
+    Encoder encoderR = new Encoder(2,3,true,CounterBase.EncodingType.k1X);
+
     @Override
     public void robotInit() {
         System.out.println("Robot Start!");
