@@ -95,7 +95,8 @@ public class Robot extends TimedRobot {
         }
     }
     private boolean didButtonTrigger(int button) {
-        return prevButton.get(button) != rJoyStk.getRawButton(button);
+        boolean curButtonState = rJoyStk.getRawButton(button);
+        return (prevButton.get(button) != curButtonState && curButtonState )
     }
 
     @Override
