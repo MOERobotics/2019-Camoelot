@@ -13,8 +13,6 @@ import java.util.List;
 public class Robot extends TimedRobot {
     int gear = 1; //gear number 1,2,3,4 only
 
-    List<Boolean> prevButton = new ArrayList<>();
-
     Joystick rJoyStk = new Joystick(1);
 
     List<TalonSRX> leftMotors = new ArrayList<>();
@@ -27,9 +25,6 @@ public class Robot extends TimedRobot {
             leftMotors.add(new TalonSRX(i+1)); //1,2,3
             rightMotors.add(new TalonSRX(i+12)); //12,13,14
             rightMotors.get(i).setInverted(true); //set right inverted
-        }
-        for(int i=0;i<10;i++){
-            prevButton.add(false);
         }
     }
     @Override
@@ -58,8 +53,8 @@ public class Robot extends TimedRobot {
         double rightMP = JoyY - JoyX;
 
         //get button triggers
-        boolean doGearUp = didButtonTrigger(3);
-        boolean doGearDown = didButtonTrigger(2);
+        boolean doGearUp = rJoyStk.getRawButtonPressed(3);
+        boolean doGearDown = rJoyStk.getRawButtonPressed(2);
 
         //if button pressed and can go up
         if(doGearUp && gear < 4) gear++;
@@ -69,34 +64,24 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("GearNum", gear);
 
         setDriveMP(leftMP, rightMP); //apply motor drive
-        updateButtonsArr(); //get all button values from joystick
     }
     private static double limit(double min, double num, double max){
         return Math.min(Math.max(num,min),max);
     }
     private void setDriveMP(double lmp, double rmp){ //takes left and right motor power
-        //limit left and right motor, then go though motor array
-        lmp = limit(-1,lmp,1);
-        rmp = limit(-1,rmp,1);
-
         double gearMult = (double)gear / 4.0; //divide by 4
         SmartDashboard.putNumber("GearMult", gearMult);
         lmp *= gearMult;
         rmp *= gearMult;
 
+        //limit left and right motor, then go though motor array
+        lmp = limit(-1,lmp,1);
+        rmp = limit(-1,rmp,1);
+
         for(int i=0;i<leftMotors.size();i++){
             leftMotors.get(i).set(ControlMode.PercentOutput, lmp);
             rightMotors.get(i).set(ControlMode.PercentOutput, rmp);
         }
-    }
-    private void updateButtonsArr(){
-        for(int i=0;i<6;i++){ //get from 1-7
-            prevButton.set(i, rJoyStk.getRawButton(i+1)); //indexs start at 1
-        }
-    }
-    private boolean didButtonTrigger(int button) {
-        boolean curButtonState = rJoyStk.getRawButton(button);
-        return (prevButton.get(button) != curButtonState && curButtonState );
     }
 
     @Override
