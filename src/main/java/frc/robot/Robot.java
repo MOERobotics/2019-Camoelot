@@ -24,6 +24,8 @@ public class Robot extends TimedRobot {
     TalonSRX shootMotorA = new TalonSRX(10);
     TalonSRX shootMotorB = new TalonSRX(11);
 
+    int gear;
+
     @Override
     public void robotInit() {
         rightMotorA.setInverted(true);
@@ -80,7 +82,7 @@ public class Robot extends TimedRobot {
             collector.set(ControlMode.PercentOutput, 0.0);
         }
 
-        /*uncomment this later if (buttonTwoIsPressed) {
+        /*if (buttonTwoIsPressed) {
             setDriveMotorPower(0.5, -.5);
 
         } else if (!buttonTwoIsPressed) {
@@ -88,27 +90,63 @@ public class Robot extends TimedRobot {
             double rightMotorPower = capMotorPower(joystickY - joystickX);
             setDriveMotorPower(leftMotorPower, rightMotorPower);
         }*/
-        if(leftMotorA.getMotorOutputPercent() == 0) {
+
+
+        if(gear == 1) {
+            if (buttonThreeIsPressed) {
+                gear = 2;
+                if (joystickY + joystickX <= 0.50) {
+                    double leftMotorPower = capMotorPower(joystickY + joystickX, 0.50);
+                    double rightMotorPower = capMotorPower(joystickY - joystickX, 0.50);
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
+                }
+            }
+        }
+        else if(gear == 2) {
             if (buttonTwoIsPressed) {
-                setDriveMotorPower(0, 0);
+                gear = 1;
+                if (joystickY + joystickX <= 0.25) {
+                    double leftMotorPower = capMotorPower(joystickY + joystickX, 0.25);
+                    double rightMotorPower = capMotorPower(joystickY - joystickX, 0.25);
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
+                }
             }
             if (buttonThreeIsPressed) {
-                setDriveMotorPower (.25, -.25)
+                gear = 3;
+                if (joystickY + joystickX <= 0.75) {
+                    double leftMotorPower = capMotorPower(joystickY + joystickX, 0.75);
+                    double rightMotorPower = capMotorPower(joystickY - joystickX,0.75);
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
+                }
             }
         }
-        if(leftMotorA.getMotorOutputPercent() == .25) {
+        else if(gear == 3) {
             if (buttonTwoIsPressed) {
-                setDriveMotorPower(0, 0.25);
+                gear = 2;
+                if (joystickY + joystickX <= 0.50) {
+                    double leftMotorPower = capMotorPower(joystickY + joystickX, 0.50);
+                    double rightMotorPower = capMotorPower(joystickY - joystickX, 0.50);
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
+                }
             }
             if (buttonThreeIsPressed) {
-                setDriveMotorPower (0.5, -.5)
+                gear = 4;
+                if (joystickY + joystickX <= 1.0) {
+                    double leftMotorPower = capMotorPower(joystickY + joystickX, 1.0);
+                    double rightMotorPower = capMotorPower(joystickY - joystickX, 1.0);
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
+                }
             }
         }
-        if(leftMotorA.getMotorOutputPercent() == .5) {
-
-        }
-        if(leftMotorA.getMotorOutputPercent() == 1.0) {
-
+        else if(gear == 4) {
+            if (buttonTwoIsPressed) {
+                gear = 3;
+                if (joystickY + joystickX <= 0.75) {
+                    double leftMotorPower = capMotorPower(joystickY + joystickX, 0.75);
+                    double rightMotorPower = capMotorPower(joystickY - joystickX, 0.75);
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
+                }
+            }
         }
 
     }
@@ -122,10 +160,12 @@ public class Robot extends TimedRobot {
     public void testPeriodic() {
     }
 
-    public static double capMotorPower(double inputMotorPower) {
-        if (inputMotorPower > 1) inputMotorPower = 1;
-        if (inputMotorPower < -1) inputMotorPower = -1;
-        return inputMotorPower;
+    public static double capMotorPower(double inputMotorPower, double cap) {
+
+            if (inputMotorPower > cap) inputMotorPower = cap;
+            if (inputMotorPower < -cap) inputMotorPower = -cap;
+            return inputMotorPower;
+
     }
 
     public void setDriveMotorPower(
