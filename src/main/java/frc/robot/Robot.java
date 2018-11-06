@@ -15,7 +15,7 @@ public class Robot extends TimedRobot {
 
     List<Boolean> prevButton = new ArrayList<>();
 
-    Joystick rJoyStk = new Joystick(0);
+    Joystick joyStick = new Joystick(0);
 
     List<TalonSRX> leftMotors = new ArrayList<>();
     List<TalonSRX> rightMotors = new ArrayList<>();
@@ -49,8 +49,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        double JoyX = rJoyStk.getX();
-        double JoyY = rJoyStk.getY();
+        double JoyX = joyStick.getX();
+        double JoyY = joyStick.getY();
 
         //calculated motor values using "Trusted Formula"!!!
         //left = Y+X   right = Y-X
@@ -91,11 +91,11 @@ public class Robot extends TimedRobot {
     }
     private void updateButtonsArr(){
         for(int i=0;i<10;i++){
-            prevButton.set(i, rJoyStk.getRawButton(i));
+            prevButton.set(i, joyStick.getRawButton(i));
         }
     }
     private boolean didButtonTrigger(int button) {
-        boolean curButtonState = rJoyStk.getRawButton(button);
+        boolean curButtonState = joyStick.getRawButton(button);
         return (prevButton.get(button) != curButtonState && curButtonState );
     }
 
