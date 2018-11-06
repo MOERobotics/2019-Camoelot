@@ -11,11 +11,11 @@ import java.util.List;
 
 @SuppressWarnings("ALL")
 public class Robot extends TimedRobot {
-    int gear; //gear number 1,2,3,4 only
+    int gear = 1; //gear number 1,2,3,4 only
 
     List<Boolean> prevButton = new ArrayList<>();
 
-    Joystick joyStick = new Joystick(0);
+    Joystick rJoyStk = new Joystick(1);
 
     List<TalonSRX> leftMotors = new ArrayList<>();
     List<TalonSRX> rightMotors = new ArrayList<>();
@@ -49,8 +49,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        double JoyX = joyStick.getX();
-        double JoyY = joyStick.getY();
+        double JoyX = rJoyStk.getX();
+        double JoyY = rJoyStk.getY();
 
         //calculated motor values using "Trusted Formula"!!!
         //left = Y+X   right = Y-X
@@ -90,12 +90,12 @@ public class Robot extends TimedRobot {
         }
     }
     private void updateButtonsArr(){
-        for(int i=0;i<10;i++){
-            prevButton.set(i, joyStick.getRawButton(i));
+        for(int i=0;i<6;i++){ //get from 1-7
+            prevButton.set(i, rJoyStk.getRawButton(i+1)); //indexs start at 1
         }
     }
     private boolean didButtonTrigger(int button) {
-        boolean curButtonState = joyStick.getRawButton(button);
+        boolean curButtonState = rJoyStk.getRawButton(button);
         return (prevButton.get(button) != curButtonState && curButtonState );
     }
 
