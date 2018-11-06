@@ -72,28 +72,30 @@ public class Robot extends TimedRobot {
 
         boolean buttonTwoIsPressed = leftJoystick.getRawButton(2);
         boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
-        //boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
+        boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
+        boolean buttonFiveIsPressed = leftJoystick.getRawButton(5);
+        boolean buttonSixIsPressed = leftJoystick.getRawButton(6);
 
-        /*if (buttonThreeIsPressed && !buttonFourIsPressed) {
+        if (buttonThreeIsPressed && !buttonFourIsPressed) {
             collector.set(ControlMode.PercentOutput, 0.5);
         } else if (buttonFourIsPressed && !buttonThreeIsPressed) {
             collector.set(ControlMode.PercentOutput, -0.5);
         } else {
             collector.set(ControlMode.PercentOutput, 0.0);
-        }*/
+        }
 
-        /*if (buttonTwoIsPressed) {
+        if (buttonTwoIsPressed) {
             setDriveMotorPower(0.5, -.5);
 
         } else if (!buttonTwoIsPressed) {
-            double leftMotorPower = capMotorPower(joystickY + joystickX);
-            double rightMotorPower = capMotorPower(joystickY - joystickX);
+            double leftMotorPower = capMotorPower(joystickY + joystickX, 1.0);
+            double rightMotorPower = capMotorPower(joystickY - joystickX,1.0);
             setDriveMotorPower(leftMotorPower, rightMotorPower);
-        }*/
+        }
 
 
         if(gear == 1) {
-            if (buttonThreeIsPressed) {
+            if (buttonSixIsPressed) {
                 gear = 2;
                 if (joystickY + joystickX <= 0.50) {
                     double leftMotorPower = capMotorPower(joystickY + joystickX, 0.50);
@@ -103,7 +105,7 @@ public class Robot extends TimedRobot {
             }
         }
         else if(gear == 2) {
-            if (buttonTwoIsPressed) {
+            if (buttonFiveIsPressed) {
                 gear = 1;
                 if (joystickY + joystickX <= 0.25) {
                     double leftMotorPower = capMotorPower(joystickY + joystickX, 0.25);
@@ -111,7 +113,7 @@ public class Robot extends TimedRobot {
                     setDriveMotorPower(leftMotorPower, rightMotorPower);
                 }
             }
-            if (buttonThreeIsPressed) {
+            if (buttonSixIsPressed) {
                 gear = 3;
                 if (joystickY + joystickX <= 0.75) {
                     double leftMotorPower = capMotorPower(joystickY + joystickX, 0.75);
@@ -121,7 +123,7 @@ public class Robot extends TimedRobot {
             }
         }
         else if(gear == 3) {
-            if (buttonTwoIsPressed) {
+            if (buttonFiveIsPressed) {
                 gear = 2;
                 if (joystickY + joystickX <= 0.50) {
                     double leftMotorPower = capMotorPower(joystickY + joystickX, 0.50);
@@ -129,7 +131,7 @@ public class Robot extends TimedRobot {
                     setDriveMotorPower(leftMotorPower, rightMotorPower);
                 }
             }
-            if (buttonThreeIsPressed) {
+            if (buttonSixIsPressed) {
                 gear = 4;
                 if (joystickY + joystickX <= 1.0) {
                     double leftMotorPower = capMotorPower(joystickY + joystickX, 1.0);
@@ -139,7 +141,7 @@ public class Robot extends TimedRobot {
             }
         }
         else if(gear == 4) {
-            if (buttonTwoIsPressed) {
+            if (buttonFiveIsPressed) {
                 gear = 3;
                 if (joystickY + joystickX <= 0.75) {
                     double leftMotorPower = capMotorPower(joystickY + joystickX, 0.75);
