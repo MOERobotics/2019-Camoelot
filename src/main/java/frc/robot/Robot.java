@@ -22,6 +22,10 @@ public class Robot extends TimedRobot {
 
     Encoder encoderL = new Encoder(0,1,true,CounterBase.EncodingType.k1X);
     Encoder encoderR = new Encoder(2,3,true,CounterBase.EncodingType.k1X);
+    /*need to find Ticks / Foot to put here
+    encoderL.setDistancePerPulse(20);
+    encoderR.setDistancePerPulse(20);
+    */
 
     @Override
     public void robotInit() {
@@ -62,6 +66,12 @@ public class Robot extends TimedRobot {
         boolean doGearUp = rJoyStk.getRawButtonPressed(3);
         boolean doGearDown = rJoyStk.getRawButtonPressed(2);
 
+        //button 5 resets encoders
+        if(rJoyStk.getRawButtonPressed(5)){
+            encoderL.reset();
+            encoderR.reset();
+        }
+
         //if button pressed and can go up
         if(doGearUp && gear < 4) gear++;
         //if button pressed and can go down
@@ -88,6 +98,8 @@ public class Robot extends TimedRobot {
             leftMotors.get(i).set(ControlMode.PercentOutput, lmp);
             rightMotors.get(i).set(ControlMode.PercentOutput, rmp);
         }
+        SmartDashboard.putNumber("Left Encoder", encoderL.getDistance() );
+        SmartDashboard.putNumber("Right Encoder", encoderR.getDistance() );
     }
 
     @Override
