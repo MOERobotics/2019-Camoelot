@@ -52,6 +52,13 @@ public class Robot extends TimedRobot {
 
     }
 
+    public void disabledPeriodic(){
+        if(rJoyStk.getRawButtonPressed(5)) {
+            encoderL.reset();
+            encoderR.reset();
+        }
+    }
+
     @Override
     public void teleopPeriodic() {
         double JoyX = rJoyStk.getX();
@@ -65,12 +72,6 @@ public class Robot extends TimedRobot {
         //get button triggers
         boolean doGearUp = rJoyStk.getRawButtonPressed(3);
         boolean doGearDown = rJoyStk.getRawButtonPressed(2);
-
-        //button 5 resets encoders
-        if(rJoyStk.getRawButtonPressed(5)){
-            encoderL.reset();
-            encoderR.reset();
-        }
 
         //if button pressed and can go up
         if(doGearUp && gear < 4) gear++;
