@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.CounterBase;
+import edu.wpi.first.wpilibj.*;
+import com.kauailabs.navx.frc.AHRS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +22,14 @@ public class Robot extends TimedRobot {
     List<TalonSRX> leftMotors = new ArrayList<>();
     List<TalonSRX> rightMotors = new ArrayList<>();
 
-    Encoder encoderL = new Encoder(0,1,true,CounterBase.EncodingType.k1X);
+    Encoder encoderL = new Encoder(0,1,false,CounterBase.EncodingType.k1X);
     Encoder encoderR = new Encoder(2,3,true,CounterBase.EncodingType.k1X);
-    /*need to find Ticks / Foot to put here
-    encoderL.setDistancePerPulse(20);
-    encoderR.setDistancePerPulse(20);
-    */
+
+    AHRS navX;
+
+    Timer mTimer = new Timer();
+
+    boolean doAutoMove = false;
 
     @Override
     public void robotInit() {
@@ -36,10 +40,19 @@ public class Robot extends TimedRobot {
             rightMotors.add(new TalonSRX(i+12)); //12,13,14
             rightMotors.get(i).setInverted(true); //set right inverted
         }
+        //need to find Ticks / Foot to put here
+        encoderL.setDistancePerPulse(12.25/1440);
+        encoderR.setDistancePerPulse(12.25/1440);
+        //initialize navX (used for finding Yaw and position etc.)
+        navX = new AHRS(SPI.Port.kMXP, (byte) 50);
     }
     @Override
     public void robotPeriodic() {
-
+        //ONLY FOR TESTING PURPOSES
+        if(rJoyStk.getRawButtonPressed(8)) {
+            encoderL.reset();
+            encoderR.reset();
+        }
     }
 
     @Override
@@ -53,21 +66,44 @@ public class Robot extends TimedRobot {
     }
 
     public void disabledPeriodic(){
-        if(rJoyStk.getRawButtonPressed(5)) {
-            encoderL.reset();
-            encoderR.reset();
-        }
+
     }
 
     @Override
     public void teleopPeriodic() {
+        if(rJoyStk.getRawButtonPressed(4)) {
+            encoderL.reset();
+            encoderR.reset();
+            mTimer.reset(); //for acceleration
+            doAutoMove = true;
+        }
+
         double JoyX = rJoyStk.getX();
         double JoyY = rJoyStk.getY();
-
+        
         //calculated motor values using "Trusted Formula"!!!
         //left = Y+X   right = Y-X
         double leftMP = JoyY + JoyX;
         double rightMP = JoyY - JoyX;
+
+        int dToMove = 12;
+        int accBuffer = 2;
+
+        //NEED TO WORK ON ACCELERATION
+        if(doAutoMove){
+            double distMoved = Math.abs(encoderL.getDistance());
+
+            if(distMoved < accBuffer) {
+                leftMP = 2*distMoved;
+                rightMP = 2*distMoved;
+            }else if(distMoved > dToMove-accBuffer){
+                leftMP = 2 - 2* (dToMove-distMoved);
+                rightMP = 2 - 2* (dToMove-distMoved);
+            }else{
+                leftMP = 1;
+                rightMP = 1;
+            }
+        }
 
         //get button triggers
         boolean doGearUp = rJoyStk.getRawButtonPressed(3);
@@ -78,7 +114,13 @@ public class Robot extends TimedRobot {
         //if button pressed and can go down
         if(doGearDown && gear > 1) gear--;
 
-        SmartDashboard.putNumber("GearNum", gear);
+        disp("Left Encoder", encoderL.getDistance() );
+        disp("Right Encoder", encoderR.getDistance() );
+
+        //Yaw
+        disp("Yaw", navX.getYaw());
+        disp("Pitch", navX.getPitch());
+        disp("Roll", navX.getRoll());
 
         setDriveMP(leftMP, rightMP); //apply motor drive
     }
@@ -87,7 +129,7 @@ public class Robot extends TimedRobot {
     }
     private void setDriveMP(double lmp, double rmp){ //takes left and right motor power
         double gearMult = (double)gear / 4.0; //divide by 4
-        SmartDashboard.putNumber("GearMult", gearMult);
+        SmartDashboard.putNumber("MotorPower: ", gearMult);
         lmp *= gearMult;
         rmp *= gearMult;
 
@@ -99,9 +141,12 @@ public class Robot extends TimedRobot {
             leftMotors.get(i).set(ControlMode.PercentOutput, lmp);
             rightMotors.get(i).set(ControlMode.PercentOutput, rmp);
         }
-        SmartDashboard.putNumber("Left Encoder", encoderL.getDistance() );
-        SmartDashboard.putNumber("Right Encoder", encoderR.getDistance() );
     }
+
+    //display functions (write to dashboard)
+    private void disp(String name, boolean data){ SmartDashboard.putBoolean(name, data); }
+    private void disp(String name, int data){ SmartDashboard.putNumber(name, data); }
+    private void disp(String name, double data){ SmartDashboard.putNumber(name, data); }
 
     @Override
     public void testPeriodic() {
