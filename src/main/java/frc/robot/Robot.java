@@ -45,6 +45,9 @@ public class Robot extends TimedRobot {
         encoderR.setDistancePerPulse(12.25/1440);
         //initialize navX (used for finding Yaw and position etc.)
         navX = new AHRS(SPI.Port.kMXP, (byte) 50);
+
+        //initialize smart dashboard number to get later
+        disp("autoMove dist", 48);
     }
     @Override
     public void robotPeriodic() {
@@ -86,23 +89,14 @@ public class Robot extends TimedRobot {
         double leftMP = JoyY + JoyX;
         double rightMP = JoyY - JoyX;
 
-        int dToMove = 12;
-        int accBuffer = 2;
+        //int dToMove = 48;
+        double dToMove = SmartDashboard.getNumber("autoMove dist", 48.0);
+        double accBuffer = 12.0;
 
         //NEED TO WORK ON ACCELERATION
         if(doAutoMove){
             double distMoved = Math.abs(encoderL.getDistance());
-
-            if(distMoved < accBuffer) {
-                leftMP = 2*distMoved;
-                rightMP = 2*distMoved;
-            }else if(distMoved > dToMove-accBuffer){
-                leftMP = 2 - 2* (dToMove-distMoved);
-                rightMP = 2 - 2* (dToMove-distMoved);
-            }else{
-                leftMP = 1;
-                rightMP = 1;
-            }
+            piecewiseAcc(distMoved, accBuffer, dToMove, 1);
         }
 
         //get button triggers
@@ -126,6 +120,16 @@ public class Robot extends TimedRobot {
     }
     private static double limit(double min, double num, double max){
         return Math.min(Math.max(num,min),max);
+    }
+    private static double piecewiseAcc(double x, double buffer, double maxX, double maxY){
+        if(0 < x && x < buffer){
+            return (maxY/buffer) * x;
+        }else if(buffer <= x && x < maxX-buffer){
+            return maxY;
+        }else if(maxX-buffer <= x && x < maxX){
+            return -maxY/buffer * (x-maxX+buffer) + maxY;
+        }
+        return 0;
     }
     private void setDriveMP(double lmp, double rmp){ //takes left and right motor power
         double gearMult = (double)gear / 4.0; //divide by 4
