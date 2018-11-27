@@ -27,8 +27,6 @@ public class Robot extends TimedRobot {
 
     AHRS navX;
 
-    Timer mTimer = new Timer();
-
     boolean doAutoMove = false;
 
     @Override
@@ -74,11 +72,15 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        if(rJoyStk.getRawButtonPressed(4)) {
+        //start moving
+        if(rJoyStk.getRawButtonPressed(5)) {
             encoderL.reset();
             encoderR.reset();
-            mTimer.reset(); //for acceleration
             doAutoMove = true;
+        }
+        //stop movingg
+        if(rJoyStk.getRawButtonPressed(4)){
+            doAutoMove = false;
         }
 
         double JoyX = rJoyStk.getX();
