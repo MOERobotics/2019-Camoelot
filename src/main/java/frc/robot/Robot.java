@@ -94,7 +94,9 @@ public class Robot extends TimedRobot {
         //NEED TO WORK ON ACCELERATION
         if(doAutoMove){
             double distMoved = Math.abs(encoderL.getDistance());
-            piecewiseAcc(distMoved, accBuffer, dToMove, 1);
+            double curVel = piecewiseAcc(distMoved, accBuffer, dToMove, 1);
+            leftMP = curVel;
+            rightMP = curVel;
         }
 
         //get button triggers
