@@ -79,9 +79,23 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
 
+        boolean buttonTwoIsPressed = leftJoystick.getRawButtonPressed(2);
         boolean buttonFiveIsPressed = leftJoystick.getRawButtonPressed(5);
         boolean buttonSixIsPressed = leftJoystick.getRawButtonPressed(6);
 
+        if(buttonTwoIsPressed){
+            while (encoderR.getRaw() <= 1320){
+                setDriveMotorPower(.3, .3);
+
+            }
+        }
+
+        SmartDashboard.putNumber("Left Encoder", -1 * encoderL.getRaw());
+        SmartDashboard.putNumber("Right Encoder", encoderR.getRaw());
+
+        if(buttonTwoIsPressed){
+            resetEncoders();
+        }
 
         if (buttonFiveIsPressed) {
             gearNumber++;
@@ -90,6 +104,7 @@ public class Robot extends TimedRobot {
         } else {
             System.out.println("Hello world");
         }
+
 
         double joystickX = leftJoystick.getX();
         double joystickY = -leftJoystick.getY();
@@ -134,6 +149,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
+    }
+
+    public void resetEncoders(){
+        encoderL.reset();
+        encoderR.reset();
     }
 
     public static double capMotorPower(double inputMotorPower, int gearNumber) {
