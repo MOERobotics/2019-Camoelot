@@ -49,11 +49,7 @@ public class Robot extends TimedRobot {
     }
     @Override
     public void robotPeriodic() {
-        //ONLY FOR TESTING PURPOSES
-        if(rJoyStk.getRawButtonPressed(8)) {
-            encoderL.reset();
-            encoderR.reset();
-        }
+
     }
 
     @Override
