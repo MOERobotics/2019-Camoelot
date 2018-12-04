@@ -30,8 +30,6 @@ public class Robot extends TimedRobot {
     Encoder encoderL = new Encoder(0, 1, true, CounterBase.EncodingType.k1X);
     Encoder encoderR = new Encoder(2, 3, true, CounterBase.EncodingType.k1X);
 
-    public boolean buttonTwoIsPressed = leftJoystick.getRawButtonPressed(2);
-
     @Override
     public void robotInit() {
         rightMotorA.setInverted(true);
@@ -39,7 +37,7 @@ public class Robot extends TimedRobot {
         rightMotorC.setInverted(true);
         System.out.printf("I am a robot\n");
         System.err.printf("Beep boop\n");
-        
+
 
 
     }
@@ -56,6 +54,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
+        boolean buttonTwoIsPressed = leftJoystick.getRawButtonPressed(2);
         if(buttonTwoIsPressed){
             resetEncoders();
         }
@@ -80,7 +79,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
 
-        boolean buttonThreeIsPressed = leftJoystick.getRawButtonPressed(3);
+        boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
         boolean buttonFiveIsPressed = leftJoystick.getRawButtonPressed(5);
         boolean buttonSixIsPressed = leftJoystick.getRawButtonPressed(6);
 
@@ -91,11 +90,16 @@ public class Robot extends TimedRobot {
         double rightMotorPower;
 
 
-        if(buttonThreeIsPressed){
-            if(java.lang.Math.abs(encoderL.getRaw()) <= 1320) {
+
+        if(java.lang.Math.abs(encoderL.getRaw()) <= 1320) {
+            if(buttonThreeIsPressed) {
                 setDriveMotorPower(.5, .5);
             }
+            else{
+                setDriveMotorPower(0,0);
+            }
         }
+
 
 /*        if (buttonFiveIsPressed) {
             gearNumber++;
