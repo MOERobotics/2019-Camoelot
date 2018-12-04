@@ -38,9 +38,9 @@ public class Robot extends TimedRobot {
             rightMotors.add(new TalonSRX(i+12)); //12,13,14
             rightMotors.get(i).setInverted(true); //set right inverted
         }
-        //need to find Ticks / Foot to put here
-        encoderL.setDistancePerPulse(12.25/1440);
-        encoderR.setDistancePerPulse(12.25/1440);
+        //need to find Inch / Pulses to put here
+        encoderL.setDistancePerPulse(1.0/112); //MAKE SURE THIS IS A DOUBLE!!!!!!!
+        encoderR.setDistancePerPulse(1.0/112);
         //initialize navX (used for finding Yaw and position etc.)
         navX = new AHRS(SPI.Port.kMXP, (byte) 50);
 
@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         //start moving
-        if(rJoyStk.getRawButtonPressed(5)) {
+        if(rJoyStk.getRawButtonPressed(5)){
             encoderL.reset();
             encoderR.reset();
             doAutoMove = true;
@@ -93,10 +93,12 @@ public class Robot extends TimedRobot {
 
         //NEED TO WORK ON ACCELERATION
         if(doAutoMove){
-            double distMoved = Math.abs(encoderL.getDistance());
-            double curVel = piecewiseAcc(distMoved, accBuffer, dToMove, 1);
-            leftMP = curVel;
-            rightMP = curVel;
+            double distMoved = encoderL.getDistance();
+            double vel = piecewiseAcc(distMoved+6, accBuffer, dToMove, 1);
+            leftMP = vel;
+            rightMP = vel;
+            //auto stop if past distance
+            if(distMoved >= dToMove){ doAutoMove = false; }
         }
 
         //get button triggers
@@ -108,6 +110,7 @@ public class Robot extends TimedRobot {
         //if button pressed and can go down
         if(doGearDown && gear > 1) gear--;
 
+        //Display Encoders
         disp("Left Encoder", encoderL.getDistance() );
         disp("Right Encoder", encoderR.getDistance() );
 
