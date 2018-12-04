@@ -93,7 +93,7 @@ public class Robot extends TimedRobot {
 
         //NEED TO WORK ON ACCELERATION
         if(doAutoMove){
-            double distMoved = encoderL.getDistance();
+            double distMoved = Math.abs(encoderL.getDistance());
             double vel = piecewiseAcc(distMoved+6, accBuffer, dToMove, 1);
             leftMP = vel;
             rightMP = vel;
@@ -101,14 +101,10 @@ public class Robot extends TimedRobot {
             if(distMoved >= dToMove){ doAutoMove = false; }
         }
 
-        //get button triggers
-        boolean doGearUp = rJoyStk.getRawButtonPressed(3);
-        boolean doGearDown = rJoyStk.getRawButtonPressed(2);
-
         //if button pressed and can go up
-        if(doGearUp && gear < 4) gear++;
+        if(rJoyStk.getRawButtonPressed(3) && gear < 4) gear++;
         //if button pressed and can go down
-        if(doGearDown && gear > 1) gear--;
+        if(rJoyStk.getRawButtonPressed(2) && gear > 1) gear--;
 
         //Display Encoders
         disp("Left Encoder", encoderL.getDistance() );
