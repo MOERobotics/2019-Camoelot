@@ -30,6 +30,7 @@ public class Robot extends TimedRobot {
     Encoder encoderL = new Encoder(0, 1, true, CounterBase.EncodingType.k1X);
     Encoder encoderR = new Encoder(2, 3, true, CounterBase.EncodingType.k1X);
 
+    public boolean buttonTwoIsPressed = leftJoystick.getRawButtonPressed(2);
 
     @Override
     public void robotInit() {
@@ -38,9 +39,7 @@ public class Robot extends TimedRobot {
         rightMotorC.setInverted(true);
         System.out.printf("I am a robot\n");
         System.err.printf("Beep boop\n");
-
-        SmartDashboard.putNumber("Power of the left encoder:", encoderL.getDistance());
-        SmartDashboard.putNumber("Power of the right encoder:", encoderR.getDistance());
+        
 
 
     }
@@ -57,7 +56,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-
+        if(buttonTwoIsPressed){
+            resetEncoders();
+        }
     }
 
     @Override
@@ -79,40 +80,41 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
 
-        boolean buttonTwoIsPressed = leftJoystick.getRawButtonPressed(2);
+        boolean buttonThreeIsPressed = leftJoystick.getRawButtonPressed(3);
         boolean buttonFiveIsPressed = leftJoystick.getRawButtonPressed(5);
         boolean buttonSixIsPressed = leftJoystick.getRawButtonPressed(6);
-
-        if(buttonTwoIsPressed){
-            while (encoderR.getRaw() <= 1320){
-                setDriveMotorPower(.3, .3);
-
-            }
-        }
 
         SmartDashboard.putNumber("Left Encoder", -1 * encoderL.getRaw());
         SmartDashboard.putNumber("Right Encoder", encoderR.getRaw());
 
-        if(buttonTwoIsPressed){
-            resetEncoders();
+        double leftMotorPower;
+        double rightMotorPower;
+
+
+        if(buttonThreeIsPressed){
+            if(java.lang.Math.abs(encoderL.getRaw()) <= 1320) {
+                setDriveMotorPower(.5, .5);
+            }
         }
 
-        if (buttonFiveIsPressed) {
+/*        if (buttonFiveIsPressed) {
             gearNumber++;
         } else if (buttonSixIsPressed) {
             gearNumber = gearNumber - 1;
         } else {
             System.out.println("Hello world");
         }
+        */
 
 
         double joystickX = leftJoystick.getX();
         double joystickY = -leftJoystick.getY();
 
-
-        double leftMotorPower = capMotorPower(joystickY + joystickX, gearNumber);
-        double rightMotorPower = capMotorPower(joystickY - joystickX, gearNumber);
+/*
+        leftMotorPower = capMotorPower(joystickY + joystickX, gearNumber);
+        rightMotorPower = capMotorPower(joystickY - joystickX, gearNumber);
         setDriveMotorPower(leftMotorPower, rightMotorPower);
+        */
         }
          /**
 
