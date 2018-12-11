@@ -157,17 +157,14 @@ public class Robot extends TimedRobot {
                 SmartDashboard.putNumber("Left ENCODER: ", encoderL.getRaw());
                 SmartDashboard.putNumber("YeehAW: ", navX.getYaw());
             }
-            else if (encoderL.getRaw() <= -(40 * TICKS_TO_INCHES) || encoderL.getRaw() >= -(42 * TICKS_TO_INCHES)) {
+            else if (encoderL.getRaw() <= -(40 * TICKS_TO_INCHES)) {
                 setDriveMotorPower(-0.6, 0.6);
                 if (navX.getYaw() <= -90) {
                     setDriveMotorPower(0, 0);
                     buttonHasBeenPressed = false;
                 }
             }
-            else {
-                buttonHasBeenPressed = false;
-                setDriveMotorPower(0,0);
-            }
+
         }
 
         SmartDashboard.putNumber("YeehAW: ", navX.getYaw());
