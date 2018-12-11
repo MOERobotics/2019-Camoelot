@@ -2,11 +2,15 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.kauailabs.navx.frc.AHRS;
+
 
 public class Robot extends TimedRobot {
 
+    final double TICKS_TO_INCHES = 112.08;
+    final double TICKS_TO_FEET = TICKS_TO_INCHES * 12;
 
     Joystick leftJoystick = new Joystick(0);
 
@@ -24,11 +28,29 @@ public class Robot extends TimedRobot {
     TalonSRX shootMotorA = new TalonSRX(10);
     TalonSRX shootMotorB = new TalonSRX(11);
 
+    Encoder encoderL = new Encoder(0, 1, true, CounterBase.EncodingType.k1X);
+    Encoder encoderR = new Encoder(2, 3, true, CounterBase.EncodingType.k1X);
+
+    AHRS navX = new AHRS(SPI.Port.kMXP, (byte) 50);
+
+    boolean buttonTwoIsPressed = leftJoystick.getRawButton(2);
+    boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
+    boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
+    boolean buttonFiveIsPressed = leftJoystick.getRawButton(5);
+    boolean buttonSixIsPressed = leftJoystick.getRawButton(6);
+
+    boolean buttonHasBeenPressed = false;
+
     @Override
     public void robotInit() {
         rightMotorA.setInverted(true);
         rightMotorB.setInverted(true);
         rightMotorC.setInverted(true);
+
+        encoderL.reset();
+        encoderR.reset();
+
+
         System.out.printf("I am a robot\n");
         System.err.printf("Beep boop\n");
     }
@@ -46,6 +68,27 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
 
+        buttonTwoIsPressed = leftJoystick.getRawButton(2);
+        buttonThreeIsPressed = leftJoystick.getRawButton(3);
+        if (buttonThreeIsPressed) {
+            encoderL.reset();
+            encoderR.reset();
+            navX.reset();
+            SmartDashboard.putNumber("Left ENCODER: ", encoderL.getRaw());
+            SmartDashboard.putNumber("Right ENCODER: ", encoderR.getRaw());
+            SmartDashboard.putNumber("YeehAW: ", navX.getYaw());
+        }
+
+        if (buttonTwoIsPressed) {
+            SmartDashboard.putString("BUTTON TWO HAS BEEN PRESSED: ", "Yes.");
+        }
+        else
+        {
+            SmartDashboard.putString("BUTTON TWO HAS BEEN PRESSED: ", "No.");
+        }
+
+
+
     }
 
     @Override
@@ -56,10 +99,14 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {
 
+
+
     }
 
     @Override
     public void teleopInit() {
+
+
 
     }
 
@@ -68,11 +115,77 @@ public class Robot extends TimedRobot {
         double joystickX = leftJoystick.getX();
         double joystickY = -leftJoystick.getY();
 
-        boolean buttonTwoIsPressed = leftJoystick.getRawButton(2);
-        boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
-        boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
-        //boolean buttonFiveIsPressed = leftJoystick.getRawButton(5);
-        //boolean buttonSixIsPressed = leftJoystick.getRawButton(6);
+        double leftMotorPower = capMotorPower(joystickY + joystickX);
+        double rightMotorPower = capMotorPower(joystickY - joystickX);
+
+        double yaw = navX.getYaw();
+
+
+        double tolerance = 0.5;
+
+
+        /*if (buttonTwoIsPressed) {
+            //setDriveMotorPower(0.5, -0.5);
+            setDriveMotorPower(leftMotorPower, leftMotorPower);
+        }*/
+
+        buttonTwoIsPressed = leftJoystick.getRawButton(2);
+
+        if (buttonTwoIsPressed) {
+            buttonHasBeenPressed = true;
+            SmartDashboard.putString("BUTTON TWO HAS BEEN PRESSED: ", "Yes.");
+        }
+        else
+        {
+            SmartDashboard.putString("BUTTON TWO HAS BEEN PRESSED: ", "No.");
+        }
+
+        if (buttonHasBeenPressed) {
+            if (encoderL.getRaw() > -(40 * TICKS_TO_INCHES)) {
+                leftMotorPower = 0.3;
+                rightMotorPower = 0.3;
+
+                if (yaw > tolerance) {
+                    leftMotorPower = 0.2;
+                }
+                else if (yaw < -tolerance) {
+                    rightMotorPower = 0.2;
+                }
+
+                setDriveMotorPower(leftMotorPower, rightMotorPower);
+
+                SmartDashboard.putNumber("Left ENCODER: ", encoderL.getRaw());
+                SmartDashboard.putNumber("YeehAW: ", navX.getYaw());
+            }
+            else if (encoderL.getRaw() <= -(40 * TICKS_TO_INCHES) || encoderL.getRaw() >= -(42 * TICKS_TO_INCHES)) {
+                setDriveMotorPower(-0.3, 0.3);
+                if (navX.getYaw() <= -90 || navX.getYaw() >= -93)
+                    setDriveMotorPower(0,0);
+            }
+            else {
+                buttonHasBeenPressed = false;
+                setDriveMotorPower(0,0);
+            }
+        }
+
+        SmartDashboard.putNumber("YeehAW: ", navX.getYaw());
+
+        /*else {
+            setDriveMotorPower(0, 0);
+        }*/
+
+
+        if (!buttonHasBeenPressed) {
+
+            //double leftMotorPower = capMotorPower(joystickY + joystickX);
+            //double rightMotorPower = capMotorPower(joystickY - joystickX);
+            setDriveMotorPower(rightMotorPower, leftMotorPower);
+
+            //if (leftMotorPower == 0.0) {
+            SmartDashboard.putNumber("Left ENCODER: ", encoderL.getRaw());
+            SmartDashboard.putNumber("Right ENCODER: ", encoderR.getRaw());
+            //}
+        }
 
         /*if (buttonThreeIsPressed && !buttonFourIsPressed) {
             collector.set(ControlMode.PercentOutput, 0.5);
@@ -82,7 +195,7 @@ public class Robot extends TimedRobot {
             collector.set(ControlMode.PercentOutput, 0.0);
         }*/
 
-        if (leftMotorA.getMotorOutputPercent() == 0) {
+        /*if (leftMotorA.getMotorOutputPercent() == 0) {
             if (buttonTwoIsPressed) {
                 setDriveMotorPower(0, 0);
             }
@@ -121,7 +234,7 @@ public class Robot extends TimedRobot {
             if (buttonThreeIsPressed) {
                 setDriveMotorPower(1, 1);
             }
-        }
+        }*/
 
         /*else {
             double leftMotorPower = capMotorPower(joystickY + joystickX);
@@ -146,10 +259,7 @@ public class Robot extends TimedRobot {
         return inputMotorPower;
     }
 
-    public void setDriveMotorPower(
-        double leftMotorPower,
-        double rightMotorPower
-    ) {
+    public void setDriveMotorPower (double leftMotorPower, double rightMotorPower) {
         leftMotorA.set(ControlMode.PercentOutput, leftMotorPower);
         leftMotorB.set(ControlMode.PercentOutput, leftMotorPower);
         leftMotorC.set(ControlMode.PercentOutput, leftMotorPower);
@@ -158,6 +268,7 @@ public class Robot extends TimedRobot {
         rightMotorB.set(ControlMode.PercentOutput, rightMotorPower);
         rightMotorC.set(ControlMode.PercentOutput, rightMotorPower);
     }
+
 
 
 }
