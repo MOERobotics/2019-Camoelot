@@ -2,11 +2,9 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import edu.wpi.first.wpilibj.CounterBase;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Encoder;
+import com.kauailabs.navx.frc.AHRS;
 
 public class Robot extends TimedRobot {
 
@@ -26,6 +24,8 @@ public class Robot extends TimedRobot {
 
     TalonSRX shootMotorA = new TalonSRX(10);
     TalonSRX shootMotorB = new TalonSRX(11);
+
+    AHRS navX = new AHRS(SPI.Port.kMXP, (byte) 50);
 
     Encoder encoderL = new Encoder(0, 1, true, CounterBase.EncodingType.k1X);
     Encoder encoderR = new Encoder(2, 3, true, CounterBase.EncodingType.k1X);
@@ -54,9 +54,16 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        boolean buttonTwoIsPressed = leftJoystick.getRawButtonPressed(2);
-        if(buttonTwoIsPressed){
-            resetEncoders();
+        boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
+        if (buttonThreeIsPressed) {
+            System.err.println("RESET");
+            encoderL.reset();
+            encoderR.reset();
+            SmartDashboard.putNumber("Left Encoder: ",encoderL.getRaw());
+            SmartDashboard.putNumber("Right Encoder: ",encoderR.getRaw());
+            float yaw = navX.getYaw();
+            navX.reset();
+            SmartDashboard.putNumber("neelyaw", yaw);
         }
     }
 
@@ -79,7 +86,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
 
-        boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
+        boolean buttonTwoIsPressed = leftJoystick.getRawButton(2);
         boolean buttonFiveIsPressed = leftJoystick.getRawButtonPressed(5);
         boolean buttonSixIsPressed = leftJoystick.getRawButtonPressed(6);
 
@@ -89,16 +96,31 @@ public class Robot extends TimedRobot {
         double leftMotorPower;
         double rightMotorPower;
 
+        float yaw = navX.getYaw();
+        double tolerance = 0.09;
+        double left = 0;
+        double right = 0;
 
 
-        if(java.lang.Math.abs(encoderL.getRaw()) <= 1320) {
-            if(buttonThreeIsPressed) {
-                setDriveMotorPower(.5, .5);
+        if(buttonTwoIsPressed) {
+
+                if(yaw > tolerance){
+                    left = 0.3;
+                    right = 0.5;
+                }
+                else if(yaw < -tolerance){
+                    left = 0.5;
+                    right = 0.3;
+                }
+                else{
+                    left = 0.4;
+                    right = 0.4;
+                }
+                setDriveMotorPower(left, right);
+                SmartDashboard.putNumber("neelyaw", yaw);
+
             }
-            else{
-                setDriveMotorPower(0,0);
-            }
-        }
+
 
 
 /*        if (buttonFiveIsPressed) {
@@ -119,6 +141,7 @@ public class Robot extends TimedRobot {
         rightMotorPower = capMotorPower(joystickY - joystickX, gearNumber);
         setDriveMotorPower(leftMotorPower, rightMotorPower);
         */
+
         }
          /**
 
