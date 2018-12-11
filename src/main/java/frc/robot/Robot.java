@@ -158,9 +158,11 @@ public class Robot extends TimedRobot {
                 SmartDashboard.putNumber("YeehAW: ", navX.getYaw());
             }
             else if (encoderL.getRaw() <= -(40 * TICKS_TO_INCHES) || encoderL.getRaw() >= -(42 * TICKS_TO_INCHES)) {
-                setDriveMotorPower(-0.3, 0.3);
-                if (navX.getYaw() <= -90 || navX.getYaw() >= -93)
-                    setDriveMotorPower(0,0);
+                setDriveMotorPower(-0.6, 0.6);
+                if (navX.getYaw() <= -90) {
+                    setDriveMotorPower(0, 0);
+                    buttonHasBeenPressed = false;
+                }
             }
             else {
                 buttonHasBeenPressed = false;
