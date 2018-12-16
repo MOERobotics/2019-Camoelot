@@ -92,8 +92,8 @@ public class Robot extends TimedRobot {
         double joystickX = leftJoystick.getX();
         double joystickY = -leftJoystick.getY();
 
-        boolean buttonTwoIsPressed = leftJoystick.getRawButton(2);
-        boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
+        boolean buttonTwoIsPressed = leftJoystick.getRawButtonPressed(2);
+        boolean buttonThreeIsPressed = leftJoystick.getRawButtonPressed(3);
         /*boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
         boolean buttonFiveIsPressed = leftJoystick.getRawButton(5);
         boolean buttonSixIsPressed = leftJoystick.getRawButton(6);
@@ -103,22 +103,53 @@ public class Robot extends TimedRobot {
             SmartDashboard.putNumber("Right Encoder: ",encoderR.getRaw());
         }*/
 
+        if (buttonTwoIsPressed) {
+            if (joystickX == 0 && joystickY == 0) {
+                if (encoderL.getRaw() <= -num || encoderR.getRaw() >= num) {
+                    setDriveMotorPower(0,0);
+                    SmartDashboard.putNumber("Left Encoder: ",encoderL.getRaw());
+                    SmartDashboard.putNumber("Right Encoder: ",encoderR.getRaw());
+                    buttonTwoIsPressed = false;
+                } else {
+                    setDriveMotorPower(0.25,0.25);
+                }
+            } else {
+                double leftMotorPower = capMotorPower(joystickY + joystickX, 1.0);
+                double rightMotorPower = capMotorPower(joystickY - joystickX,1.0);
+                setDriveMotorPower(leftMotorPower,rightMotorPower);
+            }
+        }
+
+        if (buttonThreeIsPressed) {
+            if (joystickX == 0 && joystickY == 0) {
+                if (encoderL.getRaw() <= -num || encoderR.getRaw() >= num) {
+                    setDriveMotorPower(0,1);
 
 
-            if (encoderL.getRaw() <= -4707 || encoderL.getRaw() >= 4707)  {
+                } else {
+                    setDriveMotorPower(0.25,0.25);
+                }
+            } else {
+                double leftMotorPower = capMotorPower(joystickY + joystickX, 1.0);
+                double rightMotorPower = capMotorPower(joystickY - joystickX,1.0);
+                setDriveMotorPower(leftMotorPower,rightMotorPower);
+            }
+        }
+
+           /* if (encoderL.getRaw() <= -4707 || encoderL.getRaw() >= 4707)  {
                 setDriveMotorPower(0.0,0.0);
                 SmartDashboard.putNumber("Left Encoder: ",encoderL.getRaw());
                 SmartDashboard.putNumber("Right Encoder: ",encoderR.getRaw());
                 buttonTwoIsPressed = false;
-            } else if (buttonTwoIsPressed) {
+            } else if (buttonFourIsPressed) {
                 setDriveMotorPower(0.25,0.25);
         }
 
-        if (buttonThreeIsPressed) {
+        if (buttonFourIsPressed) {
             System.err.println("Blarglefargle");
             encoderL.reset();
             encoderR.reset();
-        };
+        }; */
 
         /*if (buttonThreeIsPressed && !buttonFourIsPressed) {
             collector.set(ControlMode.PercentOutput, 0.5);
