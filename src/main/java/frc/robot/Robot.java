@@ -1,9 +1,13 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.wpilibj.CounterBase;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
 
@@ -24,6 +28,11 @@ public class Robot extends TimedRobot {
     TalonSRX shootMotorA = new TalonSRX(10);
     TalonSRX shootMotorB = new TalonSRX(11);
 
+    Encoder encoderL = new Encoder(0, 1, false, CounterBase.EncodingType.k1X);
+    Encoder encoderR = new Encoder(2, 3, false, CounterBase.EncodingType.k1X);
+
+    int gear;
+
     @Override
     public void robotInit() {
         rightMotorA.setInverted(true);
@@ -31,6 +40,14 @@ public class Robot extends TimedRobot {
         rightMotorC.setInverted(true);
         System.out.printf("I am a robot\n");
         System.err.printf("Beep boop\n");
+        encoderL.reset();
+        encoderR.reset();
+        leftMotorA.setNeutralMode(NeutralMode.Brake);
+        leftMotorB.setNeutralMode(NeutralMode.Brake);
+        leftMotorC.setNeutralMode(NeutralMode.Brake);
+        rightMotorA.setNeutralMode(NeutralMode.Brake);
+        rightMotorA.setNeutralMode(NeutralMode.Brake);
+        rightMotorA.setNeutralMode(NeutralMode.Brake);
     }
 
     @Override
@@ -45,7 +62,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-
+        boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
+        SmartDashboard.putNumber("Left Encoder: ",encoderL.getRaw());
+        SmartDashboard.putNumber("Right Encoder: ",encoderR.getRaw());
+        if (buttonThreeIsPressed) {
+            System.err.println("Blarglefargle");
+            encoderL.reset();
+            encoderR.reset();
+        }
     }
 
     @Override
@@ -70,9 +94,33 @@ public class Robot extends TimedRobot {
 
         boolean buttonTwoIsPressed = leftJoystick.getRawButton(2);
         boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
-        boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
+        /*boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
+        boolean buttonFiveIsPressed = leftJoystick.getRawButton(5);
+        boolean buttonSixIsPressed = leftJoystick.getRawButton(6);
 
-        if (buttonThreeIsPressed && !buttonFourIsPressed) {
+        if (buttonSixIsPressed) {
+            SmartDashboard.putNumber("Left Encoder: ",encoderL.getRaw());
+            SmartDashboard.putNumber("Right Encoder: ",encoderR.getRaw());
+        }*/
+
+
+
+            if (encoderL.getRaw() <= -4707 || encoderL.getRaw() >= 4707)  {
+                setDriveMotorPower(0.0,0.0);
+                SmartDashboard.putNumber("Left Encoder: ",encoderL.getRaw());
+                SmartDashboard.putNumber("Right Encoder: ",encoderR.getRaw());
+                buttonTwoIsPressed = false;
+            } else if (buttonTwoIsPressed) {
+                setDriveMotorPower(0.25,0.25);
+        }
+
+        if (buttonThreeIsPressed) {
+            System.err.println("Blarglefargle");
+            encoderL.reset();
+            encoderR.reset();
+        };
+
+        /*if (buttonThreeIsPressed && !buttonFourIsPressed) {
             collector.set(ControlMode.PercentOutput, 0.5);
         } else if (buttonFourIsPressed && !buttonThreeIsPressed) {
             collector.set(ControlMode.PercentOutput, -0.5);
@@ -84,10 +132,68 @@ public class Robot extends TimedRobot {
             setDriveMotorPower(0.5, -.5);
 
         } else if (!buttonTwoIsPressed) {
-            double leftMotorPower = capMotorPower(joystickY + joystickX);
-            double rightMotorPower = capMotorPower(joystickY - joystickX);
+            double leftMotorPower = capMotorPower(joystickY + joystickX, 1.0);
+            double rightMotorPower = capMotorPower(joystickY - joystickX,1.0);
             setDriveMotorPower(leftMotorPower, rightMotorPower);
+        }*/
+
+
+        /*if(gear == 1) {
+            if (buttonSixIsPressed) {
+                gear = 2;
+                if (joystickY + joystickX <= 0.50) {
+                    double leftMotorPower = capMotorPower(joystickY + joystickX, 0.50);
+                    double rightMotorPower = capMotorPower(joystickY - joystickX, 0.50);
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
+                }
+            }
         }
+        else if(gear == 2) {
+            if (buttonFiveIsPressed) {
+                gear = 1;
+                if (joystickY + joystickX <= 0.25) {
+                    double leftMotorPower = capMotorPower(joystickY + joystickX, 0.25);
+                    double rightMotorPower = capMotorPower(joystickY - joystickX, 0.25);
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
+                }
+            }
+            if (buttonSixIsPressed) {
+                gear = 3;
+                if (joystickY + joystickX <= 0.75) {
+                    double leftMotorPower = capMotorPower(joystickY + joystickX, 0.75);
+                    double rightMotorPower = capMotorPower(joystickY - joystickX,0.75);
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
+                }
+            }
+        }
+        else if(gear == 3) {
+            if (buttonFiveIsPressed) {
+                gear = 2;
+                if (joystickY + joystickX <= 0.50) {
+                    double leftMotorPower = capMotorPower(joystickY + joystickX, 0.50);
+                    double rightMotorPower = capMotorPower(joystickY - joystickX, 0.50);
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
+                }
+            }
+            if (buttonSixIsPressed) {
+                gear = 4;
+                if (joystickY + joystickX <= 1.0) {
+                    double leftMotorPower = capMotorPower(joystickY + joystickX, 1.0);
+                    double rightMotorPower = capMotorPower(joystickY - joystickX, 1.0);
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
+                }
+            }
+        }
+        else if(gear == 4) {
+            if (buttonFiveIsPressed) {
+                gear = 3;
+                if (joystickY + joystickX <= 0.75) {
+                    double leftMotorPower = capMotorPower(joystickY + joystickX, 0.75);
+                    double rightMotorPower = capMotorPower(joystickY - joystickX, 0.75);
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
+                }
+            }
+        }*/
 
     }
 
@@ -100,15 +206,17 @@ public class Robot extends TimedRobot {
     public void testPeriodic() {
     }
 
-    public static double capMotorPower(double inputMotorPower) {
-        if (inputMotorPower > 1) inputMotorPower = 1;
-        if (inputMotorPower < -1) inputMotorPower = -1;
+    public static double capMotorPower(double inputMotorPower, double cap) {
+
+        if (inputMotorPower > cap) inputMotorPower = cap;
+        if (inputMotorPower < -cap) inputMotorPower = -cap;
         return inputMotorPower;
+
     }
 
     public void setDriveMotorPower(
-        double leftMotorPower,
-        double rightMotorPower
+            double leftMotorPower,
+            double rightMotorPower
     ) {
         leftMotorA.set(ControlMode.PercentOutput, leftMotorPower);
         leftMotorB.set(ControlMode.PercentOutput, leftMotorPower);
