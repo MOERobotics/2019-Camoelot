@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.CounterBase;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.kauailabs.navx.frc.AHRS;
 
 public class Robot extends TimedRobot {
 
@@ -30,6 +32,8 @@ public class Robot extends TimedRobot {
 
     Encoder encoderL = new Encoder(0, 1, false, CounterBase.EncodingType.k1X);
     Encoder encoderR = new Encoder(2, 3, false, CounterBase.EncodingType.k1X);
+
+    AHRS navX = new AHRS (SPI.Port.kMXP, (byte)50);
 
     int gear;
 
@@ -57,18 +61,19 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledInit() {
-
+        navX.reset();
     }
 
     @Override
     public void disabledPeriodic() {
-        boolean buttonThreeIsPressed = leftJoystick.getRawButton(3);
+        boolean buttonFiveIsPressed = leftJoystick.getRawButton(5);
         SmartDashboard.putNumber("Left Encoder: ",encoderL.getRaw());
         SmartDashboard.putNumber("Right Encoder: ",encoderR.getRaw());
-        if (buttonThreeIsPressed) {
+        if (buttonFiveIsPressed) {
             System.err.println("Blarglefargle");
             encoderL.reset();
             encoderR.reset();
+            navX.reset();
         }
     }
 
@@ -92,8 +97,12 @@ public class Robot extends TimedRobot {
         double joystickX = leftJoystick.getX();
         double joystickY = -leftJoystick.getY();
 
+        double yaw = navX.getYaw();
+        SmartDashboard.putNumber("YawYeet: ",yaw);
+
         boolean buttonTwoIsPressed = leftJoystick.getRawButtonPressed(2);
         boolean buttonThreeIsPressed = leftJoystick.getRawButtonPressed(3);
+
         /*boolean buttonFourIsPressed = leftJoystick.getRawButton(4);
         boolean buttonFiveIsPressed = leftJoystick.getRawButton(5);
         boolean buttonSixIsPressed = leftJoystick.getRawButton(6);
@@ -102,6 +111,7 @@ public class Robot extends TimedRobot {
             SmartDashboard.putNumber("Left Encoder: ",encoderL.getRaw());
             SmartDashboard.putNumber("Right Encoder: ",encoderR.getRaw());
         }*/
+
 
         if (buttonTwoIsPressed) {
             if (joystickX == 0 && joystickY == 0) {
@@ -112,11 +122,21 @@ public class Robot extends TimedRobot {
                     buttonTwoIsPressed = false;
                 } else {
                     setDriveMotorPower(0.25,0.25);
+                    if (yaw > .5) {
+                        setDriveMotorPower(0.20,0.25);
+                    } else if (yaw < -.5){
+                        setDriveMotorPower(0.25,0.20);
+                    }
                 }
             } else {
                 double leftMotorPower = capMotorPower(joystickY + joystickX, 1.0);
                 double rightMotorPower = capMotorPower(joystickY - joystickX,1.0);
                 setDriveMotorPower(leftMotorPower,rightMotorPower);
+                if (yaw > .5) {
+                    setDriveMotorPower(leftMotorPower - 0.05, rightMotorPower);
+                } else if (yaw < -.5){
+                    setDriveMotorPower(leftMotorPower, rightMotorPower - 0.05);
+                }
             }
         }
 
@@ -124,17 +144,28 @@ public class Robot extends TimedRobot {
             if (joystickX == 0 && joystickY == 0) {
                 if (encoderL.getRaw() <= -num || encoderR.getRaw() >= num) {
                     setDriveMotorPower(0,1);
-
-
+                    encoderL.reset();
+                    encoderR.reset();
                 } else {
                     setDriveMotorPower(0.25,0.25);
+                    if (yaw > .5) {
+                        setDriveMotorPower(0.20,0.25);
+                    } else if (yaw < -.5){
+                        setDriveMotorPower(0.25,0.20);
+                    }
                 }
             } else {
                 double leftMotorPower = capMotorPower(joystickY + joystickX, 1.0);
                 double rightMotorPower = capMotorPower(joystickY - joystickX,1.0);
                 setDriveMotorPower(leftMotorPower,rightMotorPower);
+                if (yaw > .5) {
+                    setDriveMotorPower(leftMotorPower - 0.05, rightMotorPower);
+                } else if (yaw < -.5){
+                    setDriveMotorPower(leftMotorPower, rightMotorPower - 0.05);
+                }
             }
         }
+
 
            /* if (encoderL.getRaw() <= -4707 || encoderL.getRaw() >= 4707)  {
                 setDriveMotorPower(0.0,0.0);
