@@ -12,15 +12,15 @@ public class Robot extends TimedRobot {
     Joystick leftJoystick = new Joystick(0);
 
 
-    TalonSRX leftMotorA  = new TalonSRX(12);
-    TalonSRX leftMotorB  = new TalonSRX(13);
-    TalonSRX leftMotorC  = new TalonSRX(14);
+    TalonSRX leftMotorA = new TalonSRX(12);
+    TalonSRX leftMotorB = new TalonSRX(13);
+    TalonSRX leftMotorC = new TalonSRX(14);
 
-    TalonSRX rightMotorA = new TalonSRX( 1);
-    TalonSRX rightMotorB = new TalonSRX( 2);
-    TalonSRX rightMotorC = new TalonSRX( 3);
+    TalonSRX rightMotorA = new TalonSRX(1);
+    TalonSRX rightMotorB = new TalonSRX(2);
+    TalonSRX rightMotorC = new TalonSRX(3);
 
-    TalonSRX collector   = new TalonSRX( 0);
+    TalonSRX collector = new TalonSRX(0);
 
     TalonSRX shootMotorA = new TalonSRX(10);
     TalonSRX shootMotorB = new TalonSRX(11);
@@ -37,7 +37,6 @@ public class Robot extends TimedRobot {
         rightMotorC.setInverted(true);
         System.out.printf("I am a robot\n");
         System.err.printf("Beep boop\n");
-
 
 
     }
@@ -59,8 +58,8 @@ public class Robot extends TimedRobot {
             System.err.println("RESET");
             encoderL.reset();
             encoderR.reset();
-            SmartDashboard.putNumber("Left Encoder: ",encoderL.getRaw());
-            SmartDashboard.putNumber("Right Encoder: ",encoderR.getRaw());
+            SmartDashboard.putNumber("Left Encoder: ", encoderL.getRaw());
+            SmartDashboard.putNumber("Right Encoder: ", encoderR.getRaw());
             float yaw = navX.getYaw();
             navX.reset();
             SmartDashboard.putNumber("neelyaw", yaw);
@@ -82,6 +81,7 @@ public class Robot extends TimedRobot {
     }
 
     private int gearNumber = 0;
+    private int  x = 0;
 
     @Override
     public void teleopPeriodic() {
@@ -93,82 +93,145 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Left Encoder", -1 * encoderL.getRaw());
         SmartDashboard.putNumber("Right Encoder", encoderR.getRaw());
 
-        double leftMotorPower;
-        double rightMotorPower;
+        double leftMotorPower = 0;
+        double rightMotorPower = 0;
 
         float yaw = navX.getYaw();
-        double tolerance = 0.09;
+        double tolerance = 0.06;
         double left = 0;
         double right = 0;
 
 
-        if(buttonTwoIsPressed) {
 
-                if(yaw > tolerance){
-                    left = 0.3;
-                    right = 0.5;
+        if (leftJoystick.getRawButton(2)) {
+            encoderL.reset();
+            encoderR.reset();
+
+
+            if (encoderL.getDistance() <= (48 * 112)) {
+                if (yaw > tolerance) {
+                    leftMotorPower = 0.3;
+                    rightMotorPower = 0.4;
                 }
-                else if(yaw < -tolerance){
-                    left = 0.5;
-                    right = 0.3;
+                if (yaw < -tolerance) {
+                    leftMotorPower = 0.4;
+                    rightMotorPower = 0.3;
                 }
-                else{
-                    left = 0.4;
-                    right = 0.4;
+                setDriveMotorPower(leftMotorPower, rightMotorPower);
+                SmartDashboard.putNumber("YawRun", yaw);
+
+
+            }
+        }
+        if (leftJoystick.getRawButton(3)) {
+            if (x < 5) {
+                //
+                if (encoderL.getDistance() <= (48 * 112)) {
+
+                    if (yaw > tolerance) {
+                        leftMotorPower = 0.3;
+                        rightMotorPower = 0.4;
+                    }
+                    if (yaw < -tolerance) {
+                        leftMotorPower = 0.4;
+                        rightMotorPower = 0.3;
+                    }
+                    setDriveMotorPower(leftMotorPower, rightMotorPower);
                 }
-                setDriveMotorPower(left, right);
-                SmartDashboard.putNumber("neelyaw", yaw);
+                navX.reset();
+
+                if (yaw < 90) {
+                    encoderL.reset();
+                    setDriveMotorPower(0.0, 0.4);
+                    x++;
+                }
 
             }
 
 
-
-/*        if (buttonFiveIsPressed) {
-            gearNumber++;
-        } else if (buttonSixIsPressed) {
-            gearNumber = gearNumber - 1;
-        } else {
-            System.out.println("Hello world");
         }
-        */
+    }
 
 
-        double joystickX = leftJoystick.getX();
-        double joystickY = -leftJoystick.getY();
-
-/*
-        leftMotorPower = capMotorPower(joystickY + joystickX, gearNumber);
-        rightMotorPower = capMotorPower(joystickY - joystickX, gearNumber);
-        setDriveMotorPower(leftMotorPower, rightMotorPower);
-        */
-
-        }
-         /**
+    double JoyX = leftJoystick.getX();
+    double JoyY = leftJoystick.getY();
 
 
-         boolean buttonFiveIsPressed = leftJoystick.getRawButtonPressed(5);
-        boolean buttonSixIsPressed = leftJoystick.getRawButtonPressed(6);
-
-        double gearOneMotorPower;
-        double gearTwoMotorPower;
-        double gearThreeMotorPower;
-        double gearFourMotorPower;
-
-        if(buttonFiveIsPressed && !buttonSixIsPressed){
-            gearOneMotorPower = capMotorPower(.25);
-            gearTwoMotorPower = capMotorPower(.50);
-            gearThreeMotorPower = capMotorPower(.75);
-            gearFourMotorPower = capMotorPower(1.0);
+    double leftMP = JoyY + JoyX;
+    double rightMP = JoyY - JoyX;
 
 
+    double distMoved = encoderL.getDistance();
 
-        } else if(!buttonFiveIsPressed && buttonSixIsPressed){
-            gearOneMotorPower = capMotorPower(-.25);
-            gearTwoMotorPower = capMotorPower(-.50);
-            gearThreeMotorPower = capMotorPower(-.75);
-            gearFourMotorPower = capMotorPower(-1.0);
-        }
-*/
+
+    /**
+     * if(buttonTwoIsPressed) {
+     * <p>
+     * if(yaw > tolerance){
+     * left = 0.3;
+     * right = 0.5;
+     * }
+     * else if(yaw < -tolerance){
+     * left = 0.5;
+     * right = 0.3;
+     * }
+     * else{
+     * left = 0.4;
+     * right = 0.4;
+     * }
+     * setDriveMotorPower(left, right);
+     * SmartDashboard.putNumber("neelyaw", yaw);
+     * <p>
+     * }
+     * <p>
+     * <p>
+     * <p>
+     * /*        if (buttonFiveIsPressed) {
+     * gearNumber++;
+     * } else if (buttonSixIsPressed) {
+     * gearNumber = gearNumber - 1;
+     * } else {
+     * System.out.println("Hello world");
+     * }
+     * <p>
+     * <p>
+     * <p>
+     * double joystickX = leftJoystick.getX();
+     * double joystickY = -leftJoystick.getY();
+     * <p>
+     * <p>
+     * leftMotorPower = capMotorPower(joystickY + joystickX, gearNumber);
+     * rightMotorPower = capMotorPower(joystickY - joystickX, gearNumber);
+     * setDriveMotorPower(leftMotorPower, rightMotorPower);
+     * <p>
+     * <p>
+     * }
+     * <p>
+     * <p>
+     * <p>
+     * boolean buttonFiveIsPressed = leftJoystick.getRawButtonPressed(5);
+     * boolean buttonSixIsPressed = leftJoystick.getRawButtonPressed(6);
+     * <p>
+     * double gearOneMotorPower;
+     * double gearTwoMotorPower;
+     * double gearThreeMotorPower;
+     * double gearFourMotorPower;
+     * <p>
+     * if(buttonFiveIsPressed && !buttonSixIsPressed){
+     * gearOneMotorPower = capMotorPower(.25);
+     * gearTwoMotorPower = capMotorPower(.50);
+     * gearThreeMotorPower = capMotorPower(.75);
+     * gearFourMotorPower = capMotorPower(1.0);
+     * <p>
+     * <p>
+     * <p>
+     * } else if(!buttonFiveIsPressed && buttonSixIsPressed){
+     * gearOneMotorPower = capMotorPower(-.25);
+     * gearTwoMotorPower = capMotorPower(-.50);
+     * gearThreeMotorPower = capMotorPower(-.75);
+     * gearFourMotorPower = capMotorPower(-1.0);
+     * }
+     */
 
 
     @Override
@@ -180,13 +243,13 @@ public class Robot extends TimedRobot {
     public void testPeriodic() {
     }
 
-    public void resetEncoders(){
+    public void resetEncoders() {
         encoderL.reset();
         encoderR.reset();
     }
 
     public static double capMotorPower(double inputMotorPower, int gearNumber) {
-        if(gearNumber == 1) {
+        if (gearNumber == 1) {
             inputMotorPower = inputMotorPower * 0.25;
 
         } else if (gearNumber == 2) {
@@ -204,8 +267,8 @@ public class Robot extends TimedRobot {
     }
 
     public void setDriveMotorPower(
-        double leftMotorPower,
-        double rightMotorPower
+            double leftMotorPower,
+            double rightMotorPower
 
     ) {
         SmartDashboard.putNumber("Power of the left motor:", leftMotorPower);
